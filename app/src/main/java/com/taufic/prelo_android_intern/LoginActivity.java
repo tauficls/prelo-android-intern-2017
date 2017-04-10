@@ -3,12 +3,10 @@ package com.taufic.prelo_android_intern;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,12 +19,13 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static android.util.Patterns.EMAIL_ADDRESS;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
-    private Toolbar toolbar;
+//    private Toolbar toolbar;
     private EditText usernameText;
     private EditText passwordText;
 
@@ -36,14 +35,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         /* Initialize ActionBar */
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        TextView title = (TextView) findViewById(R.id.titleBar);
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        TextView title = (TextView) findViewById(R.id.titleBar);
         Button loginBtn = (Button) findViewById(R.id.loginButton);
         usernameText = (EditText) findViewById(R.id.username);
         passwordText = (EditText) findViewById(R.id.password);
-        title.setText("Login");
+//        title.setText("Login");
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,14 +53,14 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 } else {
                     userLogin();
-                    finish();
+
                 }
             }
         });
     }
     public void userLogin() {
         final String username = usernameText.getText().toString();
-        String password = passwordText.getText().toString();
+        final String password = passwordText.getText().toString();
         String url = "https://dev.prelo.id/api/auth/login";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -70,17 +69,28 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
+                            System.out.println(response);
                             responseObj = new JSONObject(response);
+                            JSONObject dataObj = (JSONObject) responseObj.get("_data");
+                            JSONObject profileObj = (JSONObject) dataObj.get("profile");
+                            JSONObject addressObj = (JSONObject) dataObj.get("default_address");
+                            if(dataObj.length() > 0){
+                                Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                intent.putExtra("username", dataObj.get("username").toString());
+                                intent.putExtra("urlPhoto", profileObj.get("pict").toString());
+                                intent.putExtra("email", dataObj.get("email").toString());
+                                intent.putExtra("fullname", dataObj.get("fullname").toString());
+                                intent.putExtra("subdistrict_name", profileObj.get("subdistrict_name").toString());
+                                intent.putExtra("region_name", addressObj.get("region_name").toString());
+                                intent.putExtra("province_name", addressObj.get("province_name").toString());
+                                startActivity(intent);
+                            }else{
+                                Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if(responseObj.length() > 0){
-                            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-                            intent.putExtra("USERNAME", username);
-                            startActivity(intent);
-                        }else{
-                            Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
-                        }
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -88,7 +98,15 @@ public class LoginActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(LoginActivity.this,error.toString(),Toast.LENGTH_LONG ).show();
                     }
-                });
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("username_or_email", username);
+                params.put("password", password);
+                return params;
+            }
+        };
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }
@@ -96,7 +114,6 @@ public class LoginActivity extends AppCompatActivity {
     public boolean validate() {
         String username = usernameText.getText().toString();
         String password = passwordText.getText().toString();
-        System.out.println(EMAIL_ADDRESS.matcher(username).matches());
         if (username.isEmpty()) {
             Toast.makeText(getBaseContext(), "Username must not empty", Toast.LENGTH_LONG).show();
             return false;

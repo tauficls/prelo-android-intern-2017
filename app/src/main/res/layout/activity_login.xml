@@ -10,9 +10,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.taufic.prelo_android_intern.LoginActivity">
 
-    <include
-        layout="@layout/toolbar"
-        android:id="@+id/toolbar"/>
+    <!--<include-->
+        <!--layout="@layout/toolbar"-->
+        <!--android:id="@+id/toolbar"/>-->
 
     <EditText
         android:id="@+id/username"
