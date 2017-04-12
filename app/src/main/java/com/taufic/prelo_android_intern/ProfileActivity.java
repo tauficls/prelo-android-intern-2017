@@ -3,14 +3,36 @@ package com.taufic.prelo_android_intern;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.taufic.prelo_android_intern.Adapter.DataAdapter;
+import com.taufic.prelo_android_intern.Item.DataItem;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileActivity extends AppCompatActivity {
+
+    private ArrayList<DataItem> data;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +47,8 @@ public class ProfileActivity extends AppCompatActivity {
         String region_name = intent.getStringExtra("region_name");
         String province_name = intent.getStringExtra("province_name");
         String urlPhoto = intent.getStringExtra("urlPhoto");
-
+        token = intent.getStringExtra("token");
+        System.out.println(token);
         /* action bar */
         getSupportActionBar().setTitle(username);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -43,6 +66,17 @@ public class ProfileActivity extends AppCompatActivity {
         usernameText.setText(username);
         emailText.setText(email);
         addressText.setText(subdistrict_name + ", " + region_name + ", " + province_name);
+
+        grabData();
+
+        data = new ArrayList<>();
+        
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        DataAdapter dataAdapter = new DataAdapter(getBaseContext(), data);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(dataAdapter);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -64,4 +98,52 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
+    public void grabData() {
+        String url = "https://dev.prelo.id/api/me/lovelist";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    JSONObject responseObj = null;
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            System.out.println(response);
+                            responseObj = new JSONObject(response);
+                            JSONArray dataArray = (JSONArray) responseObj.get("_data");
+                            if(dataArray.length() > 0){
+                                for(int i = 0; i < dataArray.length(); i++) {
+                                    DataItem dataItem = new DataItem();
+                                    JSONObject dataObj = (JSONObject) dataArray.get(i);
+                                    dataItem.setName(dataObj.get("name").toString());
+                                    dataItem.setCost("Rp " + dataObj.get("price").toString());
+                                    JSONArray picArray = (JSONArray) dataObj.get("display_picts");
+                                    dataItem.setUrlPhoto(picArray.get(0).toString());
+                                    data.add(dataItem);
+                                }
+
+                            }else{
+                                Toast.makeText(ProfileActivity.this,"no Data",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(ProfileActivity.this,"Failed Retrieve Data",Toast.LENGTH_LONG ).show();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", "Token " + token);
+                return headers;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
 }

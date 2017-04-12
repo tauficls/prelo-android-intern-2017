@@ -43,8 +43,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         Glide.with(context).load(url).into(holder.imageView);
     }
 
-
-
     @Override
     public int getItemCount() {
         return data.size();
