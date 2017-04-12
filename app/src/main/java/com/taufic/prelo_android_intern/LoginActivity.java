@@ -71,6 +71,26 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         try {
                             responseObj = new JSONObject(response);
+<<<<<<< Updated upstream
+=======
+                            JSONObject dataObj = (JSONObject) responseObj.get("_data");
+                            JSONObject profileObj = (JSONObject) dataObj.get("profile");
+                            JSONObject addressObj = (JSONObject) dataObj.get("default_address");
+                            if(dataObj.length() > 0){
+                                Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                intent.putExtra("username", dataObj.get("username").toString());
+                                intent.putExtra("urlPhoto", profileObj.get("pict").toString());
+                                intent.putExtra("email", dataObj.get("email").toString());
+                                intent.putExtra("fullname", dataObj.get("fullname").toString());
+                                intent.putExtra("subdistrict_name", profileObj.get("subdistrict_name").toString());
+                                intent.putExtra("region_name", addressObj.get("region_name").toString());
+                                intent.putExtra("province_name", addressObj.get("province_name").toString());
+                                intent.putExtra("token", dataObj.get("token").toString());
+                                startActivity(intent);
+                            }else{
+                                Toast.makeText(LoginActivity.this,"No response data",Toast.LENGTH_LONG).show();
+                            }
+>>>>>>> Stashed changes
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
