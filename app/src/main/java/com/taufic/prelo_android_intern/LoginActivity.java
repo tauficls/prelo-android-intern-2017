@@ -84,10 +84,12 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("subdistrict_name", profileObj.get("subdistrict_name").toString());
                                 intent.putExtra("region_name", addressObj.get("region_name").toString());
                                 intent.putExtra("province_name", addressObj.get("province_name").toString());
+                                intent.putExtra("token", dataObj.get("token").toString());
                                 startActivity(intent);
                             }else{
-                                Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
+                                Toast.makeText(LoginActivity.this,"No response data",Toast.LENGTH_LONG).show();
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
