@@ -29,6 +29,9 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * This class represents Profile section and Lovelist section.
+ */
 public class ProfileActivity extends AppCompatActivity {
 
     private ArrayList<DataItem> data;
@@ -98,6 +101,9 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Retrieving lovelist data from api using GET method.
+     */
     public void grabData() {
         String url = "https://dev.prelo.id/api/me/lovelist";
 

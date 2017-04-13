@@ -23,10 +23,14 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.taufic.prelo_android_intern.R.id.username;
+
+/**
+ * Login page verify user from his or her uesrname and password.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
-//    private Toolbar toolbar;
     private EditText usernameText;
     private EditText passwordText;
 
@@ -36,32 +40,37 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         /* Initialize ActionBar */
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        TextView title = (TextView) findViewById(R.id.titleBar);
-        Button loginBtn = (Button) findViewById(R.id.loginButton);
-        usernameText = (EditText) findViewById(R.id.username);
-        passwordText = (EditText) findViewById(R.id.password);
-//        title.setText("Login");
 
+        /* Initialize component */
+        Button loginBtn = (Button) findViewById(R.id.loginButton);
+        usernameText = (EditText) findViewById(username);
+        passwordText = (EditText) findViewById(R.id.password);
+
+        /* when login button on click, validate username and password */
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!validate()) {
+                if(!validate(usernameText.getText().toString(), passwordText.getText().toString())) {
                     Log.d(TAG, "login failed");
                     onLoginFailed();
                     return;
                 } else {
-                    userLogin();
+                    userLogin(usernameText.getText().toString(), passwordText.getText().toString());
 
                 }
             }
         });
     }
-    public void userLogin() {
-        final String username = usernameText.getText().toString();
-        final String password = passwordText.getText().toString();
+
+    /**
+     *
+     * @param username username from EditText.
+     * @param password password from EditText.
+     * Retrieving data from api using method POST.
+     */
+    public void userLogin(final String username, final String password) {
+
         String url = "https://dev.prelo.id/api/auth/login";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -114,9 +123,14 @@ public class LoginActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    public boolean validate() {
-        String username = usernameText.getText().toString();
-        String password = passwordText.getText().toString();
+
+    /**
+     *
+     * @param username username from EditText
+     * @param password password from EditText
+     * @return true when the validation all accepted
+     */
+    public boolean validate(String username, String password) {
         if (username.isEmpty()) {
             Toast.makeText(getBaseContext(), "Username must not empty", Toast.LENGTH_LONG).show();
             return false;
@@ -135,6 +149,9 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Give a sign when login failed
+     */
     public void onLoginFailed() {
         Toast.makeText(getBaseContext(), "login failed", Toast.LENGTH_LONG).show();
     }
