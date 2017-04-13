@@ -108,7 +108,8 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(LoginActivity.this,"loginFailed",Toast.LENGTH_LONG ).show();
+                        Toast.makeText(LoginActivity.this,"login failed check your password " +
+                                "and username",Toast.LENGTH_LONG ).show();
                     }
                 }) {
             @Override
@@ -153,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
      * Give a sign when login failed
      */
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "username or password wrong input", Toast.LENGTH_LONG).show();
     }
 
     @Override
