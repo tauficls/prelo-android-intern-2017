@@ -75,7 +75,7 @@ public class ProfileActivity extends AppCompatActivity {
         data = new ArrayList<>();
         
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        DataAdapter dataAdapter = new DataAdapter(getBaseContext(), data);
+        DataAdapter dataAdapter = new DataAdapter(this, data);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -124,6 +124,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     dataItem.setCost("Rp " + dataObj.get("price").toString());
                                     JSONArray picArray = (JSONArray) dataObj.get("display_picts");
                                     dataItem.setUrlPhoto(picArray.get(0).toString());
+                                    dataItem.setId(dataObj.get("_id").toString());
                                     data.add(dataItem);
                                 }
 
